@@ -35,35 +35,39 @@ let nowShowing = 'Vertex';
 function bindVAO (shape, program) {
   
   //create and bind VAO
-  let theVAO = gl.createVertexArray();
-  gl.bindVertexArray(theVAO);
+
+  let vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
   
   // create, bind, and fill buffer for vertex locations
   // vertex locations can be obtained from the points member of the
   // shape object.  3 floating point values (x,y,z) per vertex are
   // stored in this array.
-  let myVertexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, myVertexBuffer);
+
+  let vert_buff = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vert_buff);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(shape.points), gl.STATIC_DRAW);
   gl.enableVertexAttribArray(program.aVertexPosition);
-  gl.vertexAttribPointer(program.aVertexPosition, 4, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribPointer(program.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
   
   // create, bind, and fill buffer for normal values
   // normals can be obtained from the normals member of the
   // shape object.  3 floating point values (x,y,z) per vertex are
   // stored in this array.
-  let myBaryBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, myBaryBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(shape.bary), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(program.aBary);
-  gl.vertexAttribPointer(program.aBary, 3, gl.FLOAT, false, 0, 0);
+
+  let normal_buff = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, normal_buff);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(shape.points), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(program.aNormal);
+  gl.vertexAttribPointer(program.aNormal, 3, gl.FLOAT, false, 0, 0);
   
   // Setting up element array
   // element indicies can be obtained from the indicies member of the
   // shape object.  3 values per triangle are stored in this
   // array.
-  let myIndexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, myIndexBuffer);
+
+  let idx_buff = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, idx_buff);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(shape.indices), gl.STATIC_DRAW);
 
   // Do cleanup
@@ -72,7 +76,8 @@ function bindVAO (shape, program) {
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
   // return the VAO
-  return theVAO;
+
+  return vao;
 }
 
 
@@ -106,7 +111,15 @@ function setUpPhong(program) {
   // they are set in setUpCamera()
   //
 
-  
+  gl.uniform3fv(program.ambientLight, [0.9, 0.5, 0]);
+  gl.uniform3fv(program.lightPosition, [3, 0.9, -5]);
+  gl.uniform3fv(program.lightColor, [0.1, 0.9, 0.9]);
+  gl.uniform3fv(program.baseColor, [-0.1, 0.2, 0.9]);
+  gl.uniform1f(program.ka, 1);
+  gl.uniform1f(program.kd, 1);
+  gl.uniform1f(program.ks, 2);
+  gl.uniform1f(program.ke, 0.1);
+
   // set up your model transform...Add transformations
   // if you are moiving, scaling, or rotating the object.
   // Default is no transformations at all (identity matrix).
@@ -114,7 +127,7 @@ function setUpPhong(program) {
   let modelMatrix = glMatrix.mat4.create();
   gl.uniformMatrix4fv (program.uModelT, false, modelMatrix);
   
-  
+
 }
 
 //
@@ -133,15 +146,16 @@ function setUpCamera(program) {
 
 
   // set up your projection
-  let projMatrix = glMatrix.mat4.create();
-  //glMatrix.mat4.ortho(projMatrix, -5, 5, -5, 5, 1.0, 300.0);
-  glMatrix.mat4.perspective(projMatrix, radians(60), 1, 5, 100);
-  gl.uniformMatrix4fv (program.uProjT, false, projMatrix);
+
+  let proj = glMatrix.mat4.create();
+  glMatrix.mat4.perspective(proj, radians(40), 1, 1, 100);
+  gl.uniformMatrix4fv (program.uProjT, false, proj);
   
   // set up your view
-  let viewMatrix = glMatrix.mat4.create();
-  glMatrix.mat4.lookAt(viewMatrix, [0, 3, -11], [0, 0, 0], [0, 1, 0]);
-  gl.uniformMatrix4fv (program.uViewT, false, viewMatrix);
+
+  let view = glMatrix.mat4.create();
+  glMatrix.mat4.lookAt(view, [0, 1, -3], [0, 0, 0], [0, 1, 0]);
+  gl.uniformMatrix4fv (program.uViewT, false, view);
 }
 
 ///////////////////////////////////////////////////////////////////
