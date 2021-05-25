@@ -2,6 +2,12 @@
     "folders": [
         {
             "path": "."
+        },
+        {
+            "path": "..\\jtkitchen.github.io"
+        },
+        {
+            "path": "..\\..\\Downloads\\final_exam"
         }
     ]
 }
